@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Datasets (Do NOT commit large raw datasets to Git)
+dataset/
+CombineDataset/
+data/
+*.zip
+*.tar.gz
+
+# Large Model Weights (> 50MB should use Git LFS or GitHub Releases)
+weights/*.pth
+fyp_saved_models/*.pth
+saved_models/*.pth
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
