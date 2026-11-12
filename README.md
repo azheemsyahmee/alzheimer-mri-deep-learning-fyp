@@ -205,3 +205,9 @@ This project was developed as an undergraduate Final Year Project (Projek Sarjan
 * **Author:** Azheem Syahmee bin Zulkifli (B23CS0031)
 * **Degree:** Bachelor of Computer Science (Bioinformatics)
 * **Faculty:** Faculty of Computing, Universiti Teknologi Malaysia
+
+### Dataset Provenance & Attribution:
+The brain MRI slices analyzed in this project originate from the **Open Access Series of Imaging Studies (OASIS)** initiative, made available by Marcus et al. (2007) and accessed via Kaggle:
+* **Primary Study:** Marcus, D. S., Wang, T. H., Parker, J., Csernansky, J. G., Morris, J. C., & Buckner, R. L. (2007). *Open Access Series of Imaging Studies (OASIS): Cross-sectional MRI Data in Young, Middle Aged, Nondemented, and Demented Older Adults*. Journal of Cognitive Neuroscience, 19(9), 1498–1507.
+* **Kaggle Distribution:** [imagesoasis on Kaggle](https://www.kaggle.com/datasets/ninadaithal/imagesoasis/data) (Nina Daithal).
+* **Data Policy:** Raw MRI scan images are not redistributed in this repository. Users should refer directly to the Kaggle dataset listing and the OASIS project site for access and usage guidelines.
