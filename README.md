@@ -7,7 +7,7 @@
 
 An explainable, multi-stage deep learning framework for multi-class **Alzheimer's Disease (AD)** stage detection from structural brain Magnetic Resonance Imaging (MRI). 
 
-This research project introduces an attention-guided hybrid ensemble architecture: a global **ResNet-18** feature extractor coupled with an explainable **Grad-CAM** saliency pipeline that extracts localized, disease-critical neurodegeneration patches to train an auxiliary **PatchCNN**. Predictions are probabilistically fused, achieving **89.46% classification accuracy** across 4 clinically diagnostic stages.
+This undergraduate thesis project introduces an attention-guided hybrid ensemble architecture: a global **ResNet-18** feature extractor coupled with an explainable **Grad-CAM** saliency pipeline that extracts localized, disease-critical neurodegeneration patches to train an auxiliary **PatchCNN**. Probabilistically combining global spatial features with localized lesion attention achieves **95.16% test accuracy** (with the standalone ResNet-18 backbone achieving **95.08%**) on the primary evaluation cohort across 4 clinical stages.
 
 ---
 
@@ -68,19 +68,40 @@ This project utilizes the **Open Access Series of Imaging Studies (OASIS)** brai
 3. `MildDemented` (Mild Alzheimer's disease)
 4. `ModerateDemented` (Advanced dementia)
 
-### Class Balancing Strategy:
-In natural cohorts, `ModerateDemented` is severely underrepresented (only 488 images available) while `NonDemented` contains thousands of scans. Training directly on unmitigated distributions causes models to heavily bias toward the majority class. 
+### Experimental Cohorts & Sampling:
+In natural cohorts, `ModerateDemented` is underrepresented (488 scans) relative to common classes. Two experimental protocols were evaluated:
 
-To ensure fair sensitivity across all pathology stages, all 4 classes were systematically capped at **488 samples each**, creating a balanced evaluation cohort of **1,952 MRI scans** split deterministically (`seed=42`):
-* **Training Set (70%):** 1,366 images
-* **Validation Set (15%):** 292 images
-* **Testing Set (15%):** 294 images
+1. **Primary Evaluation Cohort (Official Thesis Benchmark):**
+   * Class capping at 2,500 scans per class with a PyTorch `WeightedRandomSampler` to handle residual imbalance during training.
+   * Split: 70% training, 15% validation, and **15% held-out test cohort ($N = 1,199$ images)**.
+   * Documented in [`notebooks/alzheimer_fyp_final2.ipynb`](notebooks/alzheimer_fyp_final2.ipynb).
+
+2. **Strict 488-Sample Balanced Subsample Study:**
+   * All 4 classes strictly downsampled to 488 images each ($1,952$ scans total) for severe-subsampling sensitivity analysis.
+   * Split: 70% training ($1,366$), 15% validation ($292$), and **15% held-out test cohort ($N = 294$ images)**.
+   * Documented in [`notebooks/ADFyp488.ipynb`](notebooks/ADFyp488.ipynb).
 
 ---
 
 ## Empirical Benchmark Results
 
-Evaluated on the held-out test cohort ($N = 294$) across 5 neural network architectures:
+### 1. Primary Thesis Benchmark (Test Cohort $N = 1,199$)
+
+Evaluated on the full held-out test cohort ($N = 1,199$) across deep neural network architectures:
+
+| Architecture | Accuracy | Macro Precision | Macro Recall | Macro F1-Score |
+| :--- | :---: | :---: | :---: | :---: |
+| **MobileNetV2** | 81.48% | 85.07% | 83.65% | 84.27% |
+| **VGG-16** | 90.41% | 91.80% | 92.26% | 91.92% |
+| **DenseNet-121** | 91.58% | 93.23% | 93.21% | 93.17% |
+| **ResNet-18 (Stage 1 Backbone)** | **95.08%** | 94.94% | 95.09% | 94.93% |
+| **Hybrid Ensemble (ResNet + PatchCNN)** | **95.16%** | **95.26%** | **95.16%** | **95.12%** |
+
+* Per-class F1-scores for the Hybrid model: `MildDemented`: 0.99, `ModerateDemented`: 1.00, `NonDemented`: 0.92, `VeryMildDemented`: 0.93.
+
+### 2. Strict Capping Ablation Study ($N = 294$)
+
+Evaluated on the strictly capped 488-per-class cohort:
 
 | Architecture | Total Parameters | Trainable Parameters | Accuracy | Macro Precision | Macro Recall | Macro F1-Score |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -88,9 +109,9 @@ Evaluated on the held-out test cohort ($N = 294$) across 5 neural network archit
 | **MobileNetV2** | 2,228,996 | 1,211,204 | 76.53% | 75.24% | 75.49% | 75.17% |
 | **DenseNet-121** | 6,957,956 | 2,162,180 | 86.05% | 85.77% | 85.72% | 85.65% |
 | **ResNet-18 (Stage 1)** | 11,178,564 | 8,395,780 | 89.12% | 88.89% | 88.95% | 88.82% |
-| **Hybrid Ensemble (Ours)** | **13,295,752** | **10,512,968** | **89.46%** | **89.18%** | **89.29%** | **89.14%** |
+| **Hybrid Ensemble** | **13,295,752** | **10,512,968** | **89.46%** | **89.18%** | **89.29%** | **89.14%** |
 
-### Fusion Sensitivity Analysis ($\alpha$)
+#### Fusion Sensitivity Analysis ($\alpha$) on 488-Cohort:
 The ensemble blends global and patch predictions: $P = \alpha \cdot P_{ResNet} + (1 - \alpha) \cdot P_{Patch}$.
 * $\alpha = 0.6$: **89.46%**
 * $\alpha = 0.7$: **89.46%**
@@ -124,7 +145,8 @@ alzheimer-mri-deep-learning-fyp/
 ├── requirements.txt                # Pinned dependency specification
 ├── README.md                       # Comprehensive project documentation
 ├── notebooks/
-│   └── ADFyp488.ipynb              # Fully executed research notebook with all outputs
+│   ├── alzheimer_fyp_final2.ipynb  # Primary thesis notebook (95.16% Hybrid, N=1,199 test cohort)
+│   └── ADFyp488.ipynb              # 488-balanced subsample sensitivity notebook (89.46% Hybrid)
 ├── src/
 │   ├── __init__.py
 │   ├── models.py                   # Model definitions (ResNet18, PatchCNN, HybridEnsemble)
